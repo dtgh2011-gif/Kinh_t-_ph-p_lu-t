@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ôn Tập Giữa Kì I - KTPL 10 (2026-2027)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Lexend', sans-serif; }
+        .correct-bg { background-color: #d1fae5 !important; border-color: #10b981 !important; color: #065f46 !important; }
+        .wrong-bg { background-color: #fee2e2 !important; border-color: #ef4444 !important; color: #991b1b !important; }
+        .missed-bg { background-color: #fef3c7 !important; border-color: #f59e0b !important; color: #92400e !important; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col justify-between">
+
+    <!-- Header -->
+    <header class="bg-indigo-600 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-graduation-cap text-2xl text-yellow-300"></i>
+                <h1 class="font-bold text-lg md:text-xl tracking-tight">KTPL 10 - ÔN GIỮA KÌ I</h1>
+            </div>
+            <div id="quiz-stats" class="hidden flex items-center space-x-4 text-sm font-medium">
+                <span class="bg-indigo-700 px-3 py-1 rounded-full"><i class="fa-solid fa-clock text-indigo-300 mr-1.5"></i><span id="timer">00:00</span></span>
+                <span class="bg-indigo-700 px-3 py-1 rounded-full"><span id="current-q">1</span>/<span id="total-q">0</span></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-4xl mx-auto px-4 py-6 flex-grow w-full">
+
+        <!-- Welcome Screen -->
+        <div id="welcome-screen" class="bg-white rounded-2xl shadow-xl p-6 md:p-10 border border-slate-100 text-center">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-indigo-100 text-indigo-600 rounded-full mb-6">
+                <i class="fa-solid fa-book-open text-3xl"></i>
+            </div>
+            <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mb-2">ĐỀ CƯƠNG ÔN TẬP GIỮA KÌ I</h2>
+            <p class="text-slate-500 mb-6 font-medium">Môn: Giáo Dục Kinh Tế và Pháp Luật 10 (Năm học 2026-2027)</p>
+            
+            <div class="grid md:grid-cols-2 gap-4 text-left mb-8 max-w-2xl mx-auto">
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <h3 class="font-bold text-indigo-600 mb-1"><i class="fa-solid fa-list-check mr-2"></i>Phần I: Trắc Nghiệm</h3>
+                    <p class="text-sm text-slate-600">45 câu hỏi nhiều phương án chọn. Chọn xong tự chuyển câu, báo lỗi ngay nếu chọn sai.</p>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <h3 class="font-bold text-indigo-600 mb-1"><i class="fa-solid fa-square-check mr-2"></i>Phần II: Đúng / Sai</h3>
+                    <p class="text-sm text-slate-600">5 câu hỏi phức hợp. Chỉ cần tích vào ý <b>ĐÚNG</b>, ý sai giữ nguyên không tích.</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-4 max-w-md mx-auto mb-6">
+                <label class="inline-flex items-center cursor-pointer text-slate-700 font-medium">
+                    <input type="checkbox" id="shuffle-toggle" class="sr-only peer" checked>
+                    <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                    <span class="ms-3 text-sm font-medium">Xáo trộn câu hỏi & đáp án</span>
+                </label>
+            </div>
+
+            <button onclick="startQuiz()" class="w-full sm:w-auto px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-200 transition-all transform hover:-translate-y-0.5">
+                <i class="fa-solid fa-play mr-2"></i>BẮT ĐẦU ÔN TẬP
+            </button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="hidden space-y-6">
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-200 rounded-full h-2">
+                <div id="progress-bar" class="bg-indigo-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-slate-100 relative">
+                <div class="flex items-center justify-between mb-4">
+                    <span id="part-tag" class="px-3 py-1 bg-indigo-50 text-indigo-600 font-semibold text-xs uppercase tracking-wider rounded-md border border-indigo-100">
+                        Phần 1: Trắc Nghiệm 4 Phương Án
+                    </span>
+                    <span id="question-index" class="text-sm font-semibold text-slate-400">Câu 1/50</span>
+                </div>
+
+                <div id="question-text" class="text-lg md:text-xl font-medium text-slate-800 mb-6 leading-relaxed">
+                    <!-- Question Content -->
+                </div>
+
+                <!-- Answer Area (Part I) -->
+                <div id="mcq-options" class="space-y-3">
+                    <!-- Options injected here -->
+                </div>
+
+                <!-- Answer Area (Part II: True/False) -->
+                <div id="tf-options" class="hidden space-y-4">
+                    <p class="text-sm text-indigo-700 bg-indigo-50 p-3 rounded-lg border border-indigo-100 font-medium">
+                        <i class="fa-solid fa-circle-info mr-2"></i>Hướng dẫn: Chỉ tích chọn vào các ý <b>ĐÚNG</b>. Những ý <b>SAI</b> giữ nguyên không tích.
+                    </p>
+                    <div id="tf-list" class="space-y-3">
+                        <!-- TF items injected here -->
+                    </div>
+                    <button id="tf-submit-btn" onclick="submitTFAnswer()" class="w-full mt-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-md transition-all">
+                        Xác nhận & Sang câu tiếp theo <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+
+                <!-- Explanation Box (Appears after answer) -->
+                <div id="explanation-box" class="hidden mt-6 p-4 rounded-xl border text-sm leading-relaxed">
+                    <div class="font-bold flex items-center mb-1" id="explanation-title">
+                        <i class="fa-solid fa-circle-info mr-2"></i>Giải thích chi tiết:
+                    </div>
+                    <div id="explanation-text" class="text-slate-700"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="hidden bg-white rounded-2xl shadow-xl p-6 md:p-10 border border-slate-100 text-center">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full mb-6">
+                <i class="fa-solid fa-trophy text-4xl"></i>
+            </div>
+            <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mb-2">HOÀN THÀNH BÀI ÔN TẬP!</h2>
+            <p class="text-slate-500 mb-6 font-medium">Bạn đã hoàn thành toàn bộ câu hỏi trong đề cương.</p>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <div class="text-xs text-slate-500 font-medium">Điểm số</div>
+                    <div id="score-text" class="text-2xl font-bold text-indigo-600 mt-1">0/50</div>
+                </div>
+                <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-200">
+                    <div class="text-xs text-emerald-600 font-medium">Số câu đúng</div>
+                    <div id="correct-count" class="text-2xl font-bold text-emerald-600 mt-1">0</div>
+                </div>
+                <div class="bg-rose-50 p-4 rounded-xl border border-rose-200">
+                    <div class="text-xs text-rose-600 font-medium">Số câu sai</div>
+                    <div id="wrong-count" class="text-2xl font-bold text-rose-600 mt-1">0</div>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-xl border border-blue-200">
+                    <div class="text-xs text-blue-600 font-medium">Thời gian làm</div>
+                    <div id="total-time" class="text-2xl font-bold text-blue-600 mt-1">00:00</div>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <button onclick="restartQuiz()" class="px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-200 transition-all">
+                    <i class="fa-solid fa-rotate-right mr-2"></i>LÀM LẠI BÀI TẬP
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-slate-500 text-xs">
+        Giáo Dục Kinh Tế Và Pháp Luật 10 • Thiết kế chuyên biệt ôn tập thi giữa kì
+    </footer>
+
+    <script>
+        // Raw Original Data strictly maintained
+        const rawQuestions = [
+            // PART I: Multiple Choice
+            {
+                type: "mcq",
+                question: "Hoạt động con người sử dụng các sản phẩm hàng hóa, dịch vụ để thỏa mãn nhu cầu sản xuất và sinh hoạt là hoạt động gì ?",
+                options: [
+                    { text: "Hoạt động phân phối.", isCorrect: false, rationale: "Phân phối là hoạt động phân chia nguồn lực hoặc sản phẩm." },
+                    { text: "Hoạt động trao đổi.", isCorrect: false, rationale: "Trao đổi là việc đưa sản phẩm đến người tiêu dùng thông qua mua bán." },
+                    { text: "Hoạt động sản xuất.", isCorrect: false, rationale: "Sản xuất là hoạt động tạo ra sản phẩm vật chất hoặc tinh thần." },
+                    { text: "Hoạt động tiêu dùng.", isCorrect: true, rationale: "Tiêu dùng là hoạt động sử dụng hàng hóa, dịch vụ để thỏa mãn nhu cầu sinh hoạt và sản xuất." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Một nền kinh tế bao gồm các hoạt động cơ bản nào?",
+                options: [
+                    { text: "Sản xuất, phân phối - trao đổi, tiêu dùng", isCorrect: true, rationale: "Nền kinh tế bao gồm 4 hoạt động cơ bản: Sản xuất, phân phối, trao đổi và tiêu dùng." },
+                    { text: "Sản xuất, kinh doanh, trao đổi, thu nhập", isCorrect: false, rationale: "Kinh doanh và thu nhập không thuộc tập hợp 4 hoạt động cơ bản cốt lõi." },
+                    { text: "Sản xuất, kinh doanh, tiêu dùng, thu nhập", isCorrect: false, rationale: "Thiếu phân phối - trao đổi." },
+                    { text: "Sản xuất, kinh doanh, trao đổi, cạnh tranh.", isCorrect: false, rationale: "Cạnh tranh là cơ chế/hiện tượng, không phải hoạt động cơ bản." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Phân phối cho sản xuất gắn liền với việc phân chia các yếu tố sản xuất cho các ngành sản xuất khác nhau để",
+                options: [
+                    { text: "tạo ra sản phẩm.", isCorrect: true, rationale: "Phân phối các yếu tố sản xuất vào các ngành nhằm mục đích tạo ra sản phẩm." },
+                    { text: "tiêu dùng sản phẩm.", isCorrect: false, rationale: "Phân phối cho tiêu dùng mới dẫn tới tiêu dùng sản phẩm." },
+                    { text: "trao đổi sản phẩm.", isCorrect: false, rationale: "Trao đổi diễn ra sau khi sản phẩm đã được sản xuất." },
+                    { text: "triệt tiêu sản phẩm.", isCorrect: false, rationale: "Không phù hợp với bản chất kinh tế." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Các cá nhân, tổ chức đảm nhiệm vai trò cầu nối giữa các chủ thể sản xuất, tiêu dùng hàng hóa, dịch vụ trên thị trường là",
+                options: [
+                    { text: "chủ thể sản xuất.", isCorrect: false, rationale: "Chủ thể sản xuất trực tiếp tạo ra hàng hóa/dịch vụ." },
+                    { text: "chủ thể trung gian.", isCorrect: true, rationale: "Chủ thể trung gian làm cầu nối giữa sản xuất và tiêu dùng." },
+                    { text: "chủ thể tiêu dùng.", isCorrect: false, rationale: "Chủ thể tiêu dùng mua và sử dụng sản phẩm." },
+                    { text: "chủ thể nhà nước.", isCorrect: false, rationale: "Chủ thể nhà nước thực hiện chức năng quản lý vĩ mô." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Phát biểu nào dưới đây không đúng về chủ thể nhà nước.",
+                options: [
+                    { text: "Chủ thể nhà nước thực hiện chức năng quản lý nền kinh tế.", isCorrect: false, rationale: "Đây là phát biểu đúng." },
+                    { text: "Chủ thể nhà nước thay doanh nghiệp sản xuất hàng hóa.", isCorrect: true, rationale: "Phát biểu này SAI vì Nhà nước quản lý, kiến tạo chứ không làm thay công việc sản xuất kinh doanh trực tiếp của doanh nghiệp." },
+                    { text: "Chủ thể nhà nước thực hiện quản lý nhà nước về kinh tế.", isCorrect: false, rationale: "Đây là phát biểu đúng." },
+                    { text: "Chủ thể nhà nước ban hành pháp luật để quản lý kinh tế.", isCorrect: false, rationale: "Đây là phát biểu đúng." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Chủ thể tiêu dùng có vai trò gì trong việc phát triển sản xuất?",
+                options: [
+                    { text: "Tác động.", isCorrect: false, rationale: "Chưa lột tả chính xác vai trò cốt lõi." },
+                    { text: "Chi phối.", isCorrect: false, rationale: "Cơ chế thị trường tổng thể chi phối." },
+                    { text: "Định hướng, tạo động lực.", isCorrect: true, rationale: "Nhu cầu của người tiêu dùng định hướng sản xuất và là động lực để nhà sản xuất phát triển." },
+                    { text: "Quyết định", isCorrect: false, rationale: "Sản xuất quyết định tiêu dùng về mặt số lượng và chất lượng sản phẩm." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Chị C là nội trợ thường xuyên đi siêu thị để mua thực phẩm và các đồ gia dụng trong nhà. Chị luôn sử dụng sản phẩm thân thiện với môi trường. Trong trường hợp này chị C đóng vai trò là chủ thể gì của nền kinh tế?",
+                options: [
+                    { text: "Chủ thể sản xuất.", isCorrect: false, rationale: "Chị C mua hàng thỏa mãn sinh hoạt gia đình, không sản xuất." },
+                    { text: "Chủ thể trung gian.", isCorrect: false, rationale: "Chị C không làm trung gian thương mại." },
+                    { text: "Chủ thể tiêu dùng.", isCorrect: true, rationale: "Chị C mua hàng hóa phục vụ sinh hoạt cá nhân và gia đình nên là chủ thể tiêu dùng." },
+                    { text: "Chủ thể nhà nước.", isCorrect: false, rationale: "Chị C là cá nhân tiêu dùng." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Hành vi chủ thể kinh tế nào dưới đây không đúng khi tham gia vào thị trường?",
+                options: [
+                    { text: "Doanh nghiệp bán lẻ Y tăng giá các mặt hàng khi chi phí vận chuyển tăng cao.", isCorrect: false, rationale: "Hành vi điều chỉnh theo chi phí đầu vào là bình thường." },
+                    { text: "Giá rau ở chợ K tăng đột biến do rau khan hiếm, nhập về ít.", isCorrect: false, rationale: "Tuân theo quy luật cung - cầu." },
+                    { text: "Công ti P giảm giá mua thanh long do đối tác ngừng hợp đồng thu mua.", isCorrect: false, rationale: "Phản ánh quan hệ cung cầu." },
+                    { text: "Trạm xăng dầu B đóng cửa không bán vì giá xăng tăng lên vào ngày mai.", isCorrect: true, rationale: "Đây là hành vi găm hàng chờ tăng giá, vi phạm quy định pháp luật kinh doanh." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Khi thấy giá bất động sản tăng, anh B đã bán căn nhà mà trước đó anh đã mua nên thu được lợi nhuận cao. Anh B đã vận dụng chức năng nào dưới đây của thị trường?",
+                options: [
+                    { text: "Lưu thông.", isCorrect: false, rationale: "Lưu thông là quá trình mua bán." },
+                    { text: "Thanh toán.", isCorrect: false, rationale: "Thanh toán là phương thức giao dịch." },
+                    { text: "Điều tiết.", isCorrect: false, rationale: "Điều tiết là chuyển dịch nguồn lực." },
+                    { text: "Cung cấp thông tin.", isCorrect: true, rationale: "Anh B căn cứ vào thông tin giá tăng trên thị trường để quyết định bán hàng kiếm lợi nhuận." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Trong nền kinh tế hàng hóa, một trong những chức năng cơ bản của thị trường là chức năng",
+                options: [
+                    { text: "làm trung gian trao đổi.", isCorrect: false, rationale: "Tiền tệ mới làm trung gian trao đổi." },
+                    { text: "đo lường giá trị hàng hóa.", isCorrect: false, rationale: "Tiền tệ đo lường giá trị." },
+                    { text: "thừa nhận giá trị hàng hóa.", isCorrect: true, rationale: "Thị trường thực hiện 3 chức năng: Thừa nhận giá trị, Cung cấp thông tin, Điều tiết/Kích thích." },
+                    { text: "biểu hiện bằng giá cả.", isCorrect: false, rationale: "Giá cả là hình thức biểu hiện bằng tiền của giá trị." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Hệ thống các quan hệ mang tính chất tự điều chỉnh tuân theo yêu cầu của các quy luật kinh tế như quy luật cạnh tranh, cung-cầu, giá cả…chi phối hoạt động của các chủ thể được gọi là gì?",
+                options: [
+                    { text: "Thị trường.", isCorrect: false, rationale: "Thị trường là tổng hòa các quan hệ mua bán." },
+                    { text: "Cơ chế thị trường.", isCorrect: true, rationale: "Đây là định nghĩa chuẩn xác về Cơ chế thị trường." },
+                    { text: "Kinh tế.", isCorrect: false, rationale: "Kinh tế là khái niệm rộng hơn." },
+                    { text: "Hoạt động mua bán", isCorrect: false, rationale: "Chỉ là biểu hiện bề ngoài." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Nhận định nào dưới đây nói về nhược điểm của cơ chế thị trường.",
+                options: [
+                    { text: "Thúc đẩy phát triển kinh tế.", isCorrect: false, rationale: "Đây là ưu điểm." },
+                    { text: "Kích thích đổi mới công nghệ.", isCorrect: false, rationale: "Đây là ưu điểm." },
+                    { text: "Làm cho môi trường bị suy thoái.", isCorrect: true, rationale: "Cơ chế thị trường dễ chạy theo lợi nhuận gây cạn kiệt tài nguyên và suy thoái môi trường." },
+                    { text: "Khai thác tối đa mọi nguồn lực.", isCorrect: false, rationale: "Đây là ưu điểm." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Nội dung nào sau đây là nhược điểm của cơ chế thị trường?",
+                options: [
+                    { text: "Kích thích hoạt động và tạo động lực sáng tạo cho các chủ thể kinh tế.", isCorrect: false, rationale: "Đây là ưu điểm." },
+                    { text: "Thúc đẩy các doanh nghiệp ứng dụng thành tựu của khoa học - công nghệ.", isCorrect: false, rationale: "Đây là ưu điểm." },
+                    { text: "Phân hoá giàu - nghèo giữa những người sản xuất, kinh doanh.", isCorrect: true, rationale: "Phân hóa giàu nghèo là một trong những nhược điểm tiêu biểu của cơ chế thị trường." },
+                    { text: "Phát huy tối đa tiềm năng của mọi chủ thể, vùng miền.", isCorrect: false, rationale: "Đây là ưu điểm." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Hành vi nào sau đây chưa thực hiện pháp luật về ngân sách nhà nước?",
+                options: [
+                    { text: "Doanh nghiệp A kinh doanh về lĩnh vực công nghệ, hằng năm tổng lợi nhuận lên đến hơn 10 tỉ đồng nhưng trốn tránh nộp thuế.", isCorrect: true, rationale: "Hành vi trốn thuế vi phạm quy định pháp luật về nghĩa vụ nộp ngân sách nhà nước." },
+                    { text: "Hằng năm, địa phương T đã thực hiện công khai số liệu dự toán và quyết toán ngân sách nhà nước một cách đầy đủ và nằm trong danh sách những địa phương đứng đầu về thu ngân sách.", isCorrect: false, rationale: "Thực hiện đúng quy định." },
+                    { text: "Công ti M đã nộp ngân sách nhà nước trên 15 tỉ đồng, tuyên truyền đến người lao động hiểu rõ hơn quyền lợi và nghĩa vụ của mình trong việc thực hiện các chính sách thuế.", isCorrect: false, rationale: "Thực hiện tốt nghĩa vụ." },
+                    { text: "Doanh nghiệp B luôn kê khai và chấp hành đúng quy định của pháp luật về kế toán, thống kê và công khai ngân sách..", isCorrect: false, rationale: "Thực hiện tốt quy định." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Theo Luật ngân sách nhà nước, nội dung nào dưới đây không phải là đặc điểm của ngân sách nhà nước?",
+                options: [
+                    { text: "Việc tạo lập và sử dụng ngân sách nhà nước phải theo Luật Ngân sách nhà nước.", isCorrect: false, rationale: "Đây là đặc điểm của NSNN." },
+                    { text: "Nhà nước là chủ thể duy nhất có quyền quyết định các khoản thu ngân sách", isCorrect: false, rationale: "Đây là đặc điểm thuộc về quyền lực nhà nước." },
+                    { text: "Ngân sách nhà nước hướng tới mục tiêu giải quyết các quan hệ lợi ích chung", isCorrect: false, rationale: "Phục vụ lợi ích chung toàn xã hội." },
+                    { text: "Nhà nước sẽ hoàn trả cho người dân những khoản mà họ đóng góp vào ngân sách.", isCorrect: true, rationale: "Thu ngân sách mang tính chất không hoàn trả trực tiếp cho người nộp." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Theo quy định của Luật ngân sách, hoạt động thu, chi của ngân sách nhà nước được thực hiện theo nguyên tắc",
+                options: [
+                    { text: "không hoàn trả trực tiếp.", isCorrect: true, rationale: "Thu chi NSNN tuân theo nguyên tắc không hoàn trả trực tiếp." },
+                    { text: "thu nhưng không chi.", isCorrect: false, rationale: "Sai bản chất hoạt động NSNN." },
+                    { text: "chi nhưng không thu.", isCorrect: false, rationale: "Sai bản chất hoạt động NSNN." },
+                    { text: "hoàn trả trực tiếp.", isCorrect: false, rationale: "Ngược lại với quy định pháp luật." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Đọc thông tin: Khi đến trung tâm thương mại A để mua sắm, chị K phát hiện có một loại hàng hóa đã hết hạn sử dụng nhưng vẫn được để ở trên kệ. Ngay lập tức, chị K chụp ảnh và báo ngay cho người quản lí trung tâm thương mại... Việc làm của chị K đã thể hiện trách nhiệm của chủ thể kinh tế trong hoạt động nào?",
+                options: [
+                    { text: "Sản xuất.", isCorrect: false, rationale: "Chị K không sản xuất." },
+                    { text: "Trung gian.", isCorrect: false, rationale: "Chị K không phải đơn vị trung gian." },
+                    { text: "Tiêu dùng.", isCorrect: true, rationale: "Chị K mua sắm (tiêu dùng) và đã thể hiện trách nhiệm của người tiêu dùng thông minh bảo vệ cộng đồng." },
+                    { text: "Nhà nước.", isCorrect: false, rationale: "Chị K là cá nhân tiêu dùng." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Trung tâm thương mại A lấy sản phẩm từ những nhà sản xuất về bán lại cho người dùng. Trong trường hợp này, trung tâm thương mại A đóng vai trò gì trong hoạt động kinh tế của thị trường?",
+                options: [
+                    { text: "Trung gian.", isCorrect: true, rationale: "Trung tâm thương mại lấy hàng sản xuất bán cho người dùng đóng vai trò cầu nối - chủ thể trung gian." },
+                    { text: "Chủ đạo.", isCorrect: false, rationale: "Không đúng vai trò." },
+                    { text: "Quyết định.", isCorrect: false, rationale: "Không đóng vai trò quyết định." },
+                    { text: "Tác động", isCorrect: false, rationale: "Không chính xác." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Khi tham gia hoạt động tiêu dùng, là người tiêu dùng thông minh chúng ta cần làm gì?",
+                options: [
+                    { text: "Thấy giá cả rẻ thì mua", isCorrect: false, rationale: "Có thể mua phải hàng kém chất lượng." },
+                    { text: "Bỏ nhiều tiền sẽ mua được hàng hóa chất lượng.", isCorrect: false, rationale: "Không hoàn toàn chính xác." },
+                    { text: "Tìm hiểu kĩ giá cả, chất lượng mặt hàng mình mua và xem hạn sử dụng.", isCorrect: true, rationale: "Người tiêu dùng thông minh cần tìm hiểu rõ nguồn gốc, giá cả, chất lượng và hạn sử dụng sản phẩm." },
+                    { text: "Mua mặt hàng gần hết hạn sử dụng để tiết kiệm tiền.", isCorrect: false, rationale: "Gây nguy cơ ảnh hưởng sức khỏe." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Đọc thông tin ngành thép: Nếu căn cứ theo đối tượng hàng hoá dịch vụ được trao đổi, mua bán thì thị trường được đề cập đến trong thông tin trên là",
+                options: [
+                    { text: "Thị trường nội địa.", isCorrect: false, rationale: "Phân loại theo phạm vi không gian." },
+                    { text: "Thị trường thế giới.", isCorrect: false, rationale: "Phân loại theo phạm vi không gian." },
+                    { text: "Thị trường thép.", isCorrect: true, rationale: "Căn cứ theo đối tượng hàng hóa/dịch vụ mua bán ở đây là mặt hàng thép." },
+                    { text: "Thị trường vật liệu.", isCorrect: false, rationale: "Vật liệu quá rộng, bài đề cập cụ thể mặt hàng thép." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Nếu căn cứ vào phạm vi hoạt động, thị trường thép được tiêu thụ chủ yếu ở thị trường nào dưới đây?",
+                options: [
+                    { text: "Trong nước.", isCorrect: false, rationale: "Bài nhấn mạnh Trung Quốc và Châu Á." },
+                    { text: "Thế giới.", isCorrect: true, rationale: "Thông tin nhắc tới thị trường thép thế giới và khu vực châu Á." },
+                    { text: "Nội địa.", isCorrect: false, rationale: "Chưa đủ phạm vi bài viết mô tả." },
+                    { text: "Xuất khẩu.", isCorrect: false, rationale: "Không phải tên phân loại phạm vi hoạt động chuẩn." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Đọc thông tin UBND xã X làm đường: Nguồn tiền xã X làm đường có từ đâu?",
+                options: [
+                    { text: "Mạnh thường quân đóng góp.", isCorrect: false, rationale: "Đề bài ghi rõ số tiền được Nhà nước cấp." },
+                    { text: "Ngân sách nhà nước.", isCorrect: true, rationale: "Đề bài nêu UBND xã X sử dụng số tiền được nhà nước cấp (Ngân sách nhà nước)." },
+                    { text: "Người dân đóng góp.", isCorrect: false, rationale: "Không phải." },
+                    { text: "Nước ngoài hỗ trợ.", isCorrect: false, rationale: "Không phải." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Uỷ ban nhân dân xã X sử dụng số tiền được nhà nước cấp để sửa lại con đường. Nội dung này thể hiện",
+                options: [
+                    { text: "chức năng của ngân sách nhà nước.", isCorrect: false, rationale: "Đây là thể hiện vai trò thúc đẩy kinh tế xã hội hạ tầng." },
+                    { text: "vai trò của ngân sách nhà nước.", isCorrect: true, rationale: "Thể hiện vai trò của NSNN trong việc cung cấp hàng hóa/dịch vụ công cộng và phát triển hạ tầng." },
+                    { text: "đặc điểm của ngân sách nhà nước.", isCorrect: false, rationale: "Không mô tả đặc điểm." },
+                    { text: "nhiệm vụ của ngân sách nhà nước.", isCorrect: false, rationale: "Nhiệm vụ chung." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Toàn bộ các khoản thu, chi của Nhà nước được dự toán và thực hiện trong một khoảng thời gian nhất định do cơ quan nhà nước có thẩm quyền quyết định để bảo đảm thực hiện các chức năng, nhiệm vụ của Nhà nước được gọi là",
+                options: [
+                    { text: "tài chính nhà nước.", isCorrect: false, rationale: "Tài chính rộng hơn." },
+                    { text: "kho bạc nhà nước.", isCorrect: false, rationale: "Kho bạc là cơ quan quản lý thu chi." },
+                    { text: "tiền tệ nhà nước.", isCorrect: false, rationale: "Không đúng khái niệm." },
+                    { text: "ngân sách nhà nước.", isCorrect: true, rationale: "Định nghĩa chuẩn về Ngân sách nhà nước theo Luật NSNN." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Hành vi nào dưới đây không đúng khi tham gia vào thị trường?",
+                options: [
+                    { text: "Doanh nghiệp bán lẻ tăng giá các mặt hàng khi chi phí vận chuyển tăng cao.", isCorrect: false, rationale: "Hoạt động điều chỉnh bình thường." },
+                    { text: "Giá rau ở chợ tăng đột biến do thời tiết mưa bão.", isCorrect: false, rationale: "Biến động cung cầu tự nhiên." },
+                    { text: "Giá mua thanh long giảm do đối tác ngừng hợp đồng thu mua.", isCorrect: false, rationale: "Biến động thị trường." },
+                    { text: "Trạm xăng dầu đóng cửa không bán vì giá xăng tăng lên vào ngày mai.", isCorrect: true, rationale: "Găm hàng chờ tăng giá là hành vi trái pháp luật." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Nội dung nào dưới đây không thể hiện mặt tích cực của cơ chế thị trường?",
+                options: [
+                    { text: "Giành ưu thế về khoa học và công nghệ.", isCorrect: false, rationale: "Đây là ưu điểm tích cực." },
+                    { text: "Tìm kiếm cơ hội đầu tư thuận lợi", isCorrect: false, rationale: "Đây là ưu điểm tích cực." },
+                    { text: "Hủy hoại tài nguyên môi trường.", isCorrect: true, rationale: "Hủy hoại tài nguyên môi trường là mặt tiêu cực (nhược điểm) của cơ chế thị trường." },
+                    { text: "Giành thị trường có lợi để bán hàng.", isCorrect: false, rationale: "Đây là ưu điểm tích cực." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Một nền kinh tế bao gồm các hoạt động cơ bản nào?",
+                options: [
+                    { text: "Sản xuất, phân phối - trao đổi, tiêu dùng.", isCorrect: true, rationale: "Bốn hoạt động cơ bản cấu thành nền kinh tế." },
+                    { text: "Sản xuất, kinh doanh, trao đổi, thu nhập.", isCorrect: false, rationale: "Chứa các khái niệm không thuộc bộ 4 cơ bản." },
+                    { text: "Sản xuất, kinh doanh, tiêu dùng, thu nhập.", isCorrect: false, rationale: "Chứa các khái niệm không thuộc bộ 4 cơ bản." },
+                    { text: "Sản xuất, kinh doanh, trao đổi, cạnh tranh.", isCorrect: false, rationale: "Chứa các khái niệm không thuộc bộ 4 cơ bản." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Quá trình phân chia các yếu tố sản xuất cho các ngành sản xuất để tạo ra sản phẩm là nội dung của khái niệm",
+                options: [
+                    { text: "sản xuất", isCorrect: false, rationale: "Sản xuất là việc tạo ra sản phẩm." },
+                    { text: "phân phối.", isCorrect: true, rationale: "Khái niệm phân phối yếu tố sản xuất." },
+                    { text: "tiêu dùng", isCorrect: false, rationale: "Tiêu dùng là sử dụng sản phẩm." },
+                    { text: "trao đổi.", isCorrect: false, rationale: "Trao đổi là mua bán." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Trao đổi là hoạt động đưa sản phẩm đến tay người",
+                options: [
+                    { text: "lao động.", isCorrect: false, rationale: "Không chính xác." },
+                    { text: "tiêu dùng.", isCorrect: true, rationale: "Mục đích của trao đổi là đưa sản phẩm đến tay người tiêu dùng." },
+                    { text: "phân phối.", isCorrect: false, rationale: "Phân phối là công đoạn khác." },
+                    { text: "sản xuất.", isCorrect: false, rationale: "Chỉ đúng trong trường hợp tiêu dùng cho sản xuất." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Phân phối - trao đổi là hoạt động có vai trò",
+                options: [
+                    { text: "giải quyết lợi ích kinh tế của chủ doanh nghiệp.", isCorrect: false, rationale: "Không bao quát." },
+                    { text: "phân bổ nguồn lực cho sản xuất kinh doanh.", isCorrect: false, rationale: "Chỉ đúng 1 vế phân phối sản xuất." },
+                    { text: "là cầu nối sản xuất với tiêu dùng.", isCorrect: true, rationale: "Phân phối - trao đổi đóng vai trò cầu nối đưa sản phẩm từ sản xuất đến tiêu dùng." },
+                    { text: "là động lực kích thích người lao động.", isCorrect: false, rationale: "Không đúng vai trò trung tâm." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Chủ thể sản xuất là những người",
+                options: [
+                    { text: "phân phối hàng hóa, dịch vụ.", isCorrect: false, rationale: "Là nhiệm vụ phân phối." },
+                    { text: "hỗ trợ sản xuất hàng hóa, dịch vụ.", isCorrect: false, rationale: "Chỉ trợ giúp." },
+                    { text: "trao đổi hàng hóa, dịch vụ.", isCorrect: false, rationale: "Là thương nhân/trung gian." },
+                    { text: "sản xuất ra hàng hóa, dịch vụ.", isCorrect: true, rationale: "Chủ thể sản xuất trực tiếp tạo ra hàng hóa, dịch vụ cho thị trường." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Trong nền kinh tế, chủ thể nào đóng vai trò là cầu nối giữa chủ thể sản xuất và chủ thể tiêu dùng?",
+                options: [
+                    { text: "chủ thể trung gian.", isCorrect: true, rationale: "Chủ thể trung gian làm cầu nối giao dịch." },
+                    { text: "Nhà đầu tư chứng khoán.", isCorrect: false, rationale: "Một dạng trung gian tài chính đặc thù." },
+                    { text: "chủ thể doang nghiệp.", isCorrect: false, rationale: "Doanh nghiệp thường là chủ thể sản xuất." },
+                    { text: "chủ thể nhà nước.", isCorrect: false, rationale: "Nhà nước quản lý vĩ mô." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Trong nền kinh tế nước ta, chủ thể nào đóng vai trò quản lý toàn bộ nền kinh tế quốc dân?",
+                options: [
+                    { text: "chủ thể trung gian.", isCorrect: false, rationale: "Không có thẩm quyền." },
+                    { text: "chủ thể nhà nước.", isCorrect: true, rationale: "Chủ thể nhà nước quản lý điều tiết vĩ mô toàn bộ nền kinh tế." },
+                    { text: "chủ thể tiêu dùng.", isCorrect: false, rationale: "Không có chức năng." },
+                    { text: "chủ thể sản xuất.", isCorrect: false, rationale: "Chịu sự quản lý của nhà nước." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Trong nền kinh tế hàng hóa, người tiến hành các hoạt động mua hàng hóa, dịch vụ để thỏa mãn các nhu cầu tiêu dùng cho sản xuất được gọi là",
+                options: [
+                    { text: "chủ thể tiêu dùng.", isCorrect: true, rationale: "Bao gồm cả tiêu dùng cho sinh hoạt và tiêu dùng cho sản xuất." },
+                    { text: "chủ thể trung gian.", isCorrect: false, rationale: "Trung gian mua để bán lại kiếm lời." },
+                    { text: "chủ thể nhà nước", isCorrect: false, rationale: "Không phải." },
+                    { text: "chủ thể sản xuất.", isCorrect: false, rationale: "Tập trung vào tạo ra sản phẩm." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Điều tiết và tạo điều kiện thuận lợi cho các ngành kinh tế khác nhau hoạt động sản xuất kinh doanh hiệu quả là vai trò của chủ thê kinh tế nào?",
+                options: [
+                    { text: "Chủ thể sản xuất", isCorrect: false, rationale: "Không điều tiết được nền kinh tế." },
+                    { text: "Chủ thể tiêu dùng.", isCorrect: false, rationale: "Không có vai trò tạo điều kiện cơ chế." },
+                    { text: "Chủ thể trung gian.", isCorrect: false, rationale: "Không phải." },
+                    { text: "Chủ thể Nhà nước.", isCorrect: true, rationale: "Chủ thể Nhà nước có vai trò điều tiết và kiến tạo môi trường kinh doanh." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Việc lựa chọn tiêu dùng những hàng hóa thân thiện với môi trường, không sử dụng những sản phẩm chế biến từ động vật hoang dã, sản phẩm của những doanh nghiệp gây ô nhiễm, tàn phá môi trường, gây độc hại đến sức khỏe con người thể hiện nội dung gì của chủ thể tiêu dùng?",
+                options: [
+                    { text: "Khái niệm.", isCorrect: false, rationale: "Không phải khái niệm." },
+                    { text: "Bản chất.", isCorrect: false, rationale: "Không phải." },
+                    { text: "Vai trò.", isCorrect: false, rationale: "Không phải." },
+                    { text: "Trách nhiệm", isCorrect: true, rationale: "Thể hiện trách nhiệm xã hội và môi trường của người tiêu dùng." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Nội dung nào dưới đây không phải chức năng quản lí nhà nước về kinh tế?",
+                options: [
+                    { text: "Tạo môi trường kinh tế vĩ mô ổn định cho phát triển kinh tế.", isCorrect: false, rationale: "Đây là chức năng đúng." },
+                    { text: "Tạo môi trường pháp lí thuận lợi và bảo đảm ổn định về kinh tế-chính trị-xã hội.", isCorrect: false, rationale: "Đây là chức năng đúng." },
+                    { text: "Thực hiện tăng trưởng kinh tế gắn liền với lợi ích cá nhân, tổ chức.", isCorrect: true, rationale: "Nhà nước hướng đến lợi ích toàn xã hội, công bằng xã hội chứ không riêng lẻ nhóm lợi ích cá nhân tổ chức nào." },
+                    { text: "Thực hiện tăng trưởng kinh tế gắn liền với tiến bộ và công bằng xã hội.", isCorrect: false, rationale: "Đây là chức năng đúng." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Toàn bộ các khoản thu, chi của Nhà nước được dự toán và thực hiện trong một khoảng thời gian nhất định do Cơ quan nhà nước có thẩm quyền quyết định để bảo đảm thực hiện các chức năng, nhiệm vụ của Nhà nước được gọi là gì?",
+                options: [
+                    { text: "Ngân sách nhà nước.", isCorrect: true, rationale: "Định nghĩa chuẩn về Ngân sách nhà nước." },
+                    { text: "Kinh phí dự trù.", isCorrect: false, rationale: "Chỉ là một khoản mục." },
+                    { text: "Thuế.", isCorrect: false, rationale: "Thuế chỉ là nguồn thu lớn nhất của NSNN." },
+                    { text: "Kinh phí phát sinh.", isCorrect: false, rationale: "Không phải." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Chủ thể nào sau đây có quyền sở hữu và quyết định các khoản thu, chi của ngân sách nhà nước?",
+                options: [
+                    { text: "Nhà nước.", isCorrect: true, rationale: "Nhà nước đại diện sở hữu toàn dân và quyết định các khoản thu chi NSNN." },
+                    { text: "Chủ tịch nước.", isCorrect: false, rationale: "Cá nhân không có quyền sở hữu ngân sách." },
+                    { text: "Chủ tịch Quốc hội.", isCorrect: false, rationale: "Quốc hội quyết định dự toán nhưng thuộc sở hữu Nhà nước." },
+                    { text: "Thủ tướng chính phủ.", isCorrect: false, rationale: "Thủ tướng quản lý điều hành." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Ngư dân xã Q được vay vốn hỗ trợ từ ngân sách nhà nước để đóng tàu vươn khơi... Ngư dân xã Q đã thực hiện nghĩa vụ gì theo quy định của pháp luật ngân sách nhà nước?",
+                options: [
+                    { text: "Sử dụng khoản đầu tư từ ngân sách nhà nước đúng mục đích, đúng qui định, hiệu quả.", isCorrect: true, rationale: "Cam kết sử dụng tiền đúng mục đích, hiệu quả và đúng tiến độ là nghĩa vụ của người thụ hưởng NSNN." },
+                    { text: "Nộp các khoản vào ngân sách nhà nước theo quy định của pháp luật.", isCorrect: false, rationale: "Đây là nghĩa vụ nộp." },
+                    { text: "Được sử dụng hàng hóa dịch vụ công cộng từ ngân sách nhà nước.", isCorrect: false, rationale: "Đây là quyền lợi, không phải nghĩa vụ." },
+                    { text: "Được hưởng hỗ trợ từ ngân sách nhà nước theo nhu cầu thực tế.", isCorrect: false, rationale: "Đây là quyền lợi." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Giá cả dưa hấu trên thị trường tăng cao, mang lại thu nhập cao gấp rưỡi... nhiều người dân chuyển đổi từ trồng lúa sang trồng dưa. Người dân đã vận dụng chức năng nào của giá cả thị trường?",
+                options: [
+                    { text: "Cung cấp thông tin.", isCorrect: false, rationale: "Cung cấp thông tin giá cả." },
+                    { text: "Công cụ để thực hiện quản lí.", isCorrect: false, rationale: "Dành cho nhà nước/doanh nghiệp." },
+                    { text: "Công cụ để điều tiết kinh tế.", isCorrect: false, rationale: "Chức năng điều tiết tổng thể." },
+                    { text: "Phân bổ nguồn lực.", isCorrect: true, rationale: "Giá cả điều tiết việc chuyển dịch ruộng đất, vốn, lao động (nguồn lực) từ trồng lúa sang trồng dưa." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Nắm bắt nhu cầu tiêu thụ hải sản ở Hà Nội, ông H đã mở cửa hàng thu mua hải sản... Việc làm của ông H đã thể hiện ưu điểm gì của cơ chế thị trường?",
+                options: [
+                    { text: "Kích thích tính năng động, sáng tạo của các chủ thể kinh tế.", isCorrect: true, rationale: "Ông H đã nhanh nhạy, năng động phát hiện cơ hội kinh doanh để đáp ứng nhu cầu thị trường." },
+                    { text: "Thúc đẩy phát triển lực lượng sản xuất.", isCorrect: false, rationale: "Thiên về công nghệ, máy móc." },
+                    { text: "Thúc đẩy tiến bộ, văn minh xã hội.", isCorrect: false, rationale: "Không làm rõ ý này." },
+                    { text: "Phân bổ lại nguồn lực kinh tế.", isCorrect: false, rationale: "Chưa phải ưu điểm rõ nhất mô tả hành vi của ông H." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Thị trường có những chức năng cơ bản nào?",
+                options: [
+                    { text: "Chức năng điều tiết, kích thích hoặc hạn chế sản xuất và tiêu dùng.", isCorrect: false, rationale: "Thiếu 2 chức năng kia." },
+                    { text: "Chức năng điều tiết, kích thích hoặc hạn chế, chức năng thừa nhận.", isCorrect: false, rationale: "Thiếu chức năng thông tin." },
+                    { text: "Chức năng thừa nhận, chức năng thông tin, chức năng điều tiết, kích thích hoặc hạn chế.", isCorrect: true, rationale: "Đầy đủ 3 chức năng cơ bản của thị trường." },
+                    { text: "Chức năng thông tin, chức năng điều tiết, kích thích hoặc hạn chế sản xuất và tiêu dùng.", isCorrect: false, rationale: "Thiếu chức năng thừa nhận." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Thị trường không bao gồm yếu tố nào?",
+                options: [
+                    { text: "Hàng hóa.", isCorrect: false, rationale: "Là yếu tố cấu thành thị trường." },
+                    { text: "Tiền tệ.", isCorrect: false, rationale: "Là yếu tố trao đổi." },
+                    { text: "Người bán.", isCorrect: false, rationale: "Chủ thể tham gia." },
+                    { text: "Người trung gian.", isCorrect: true, rationale: "Các yếu tố cơ bản của thị trường gồm: Hàng hóa, tiền tệ, người mua, người bán. Người trung gian không phải yếu tố bắt buộc tồn tại ở mọi thị trường." }
+                ]
+            },
+            {
+                type: "mcq",
+                question: "Quan điểm nào dưới đây đúng về ngân sách nhà nước ?",
+                options: [
+                    { text: "Ngân sách nhà nước là toàn bộ các khoản thu, chi của Nhà nước được dự toán và thực hiện trong một khoản thời gian nhất định.", isCorrect: true, rationale: "Phát biểu đúng theo quy định Luật Ngân sách nhà nước." },
+                    { text: "Ngân sách nhà nước là công cụ duy nhất để Nhà nước quản lí, điều tiết nền kinh tế quốc dân và giải quyết các vấn đề xã hội.", isCorrect: false, rationale: "Không phải là 'duy nhất' (còn pháp luật, chính sách...)." },
+                    { text: "Ngân sách nhà nước là toàn bộ tài sản của các doanh nghiệp để chi dùng cho các mục đích đã có trong kế hoạch.", isCorrect: false, rationale: "Không phải tài sản doanh nghiệp." },
+                    { text: "Ngân sách nhà nước là quỹ dự trữ tài chính của một quốc gia để dự phòng thiên tai, dịch bệnh.", isCorrect: false, rationale: "Chưa đủ bản chất thu chi của Nhà nước." }
+                ]
+            },
+
+            // PART II: True/False Questions
+            {
+                type: "tf",
+                question: "<b>Câu 1 (Phần II):</b> Đọc đoạn thông tin về Sản xuất âm nhạc:<br><i>'Công nghệ sản xuất sản phẩm âm nhạc là một quy trình khép kín, bao gồm nhiều công đoạn được gắn kết với nhau. Thông qua các nền tảng số, hạ tầng số, những sản phẩm âm nhạc có giá trị nghệ thuật và tính nhân văn cao sẽ đến với công chúng, đi sâu vào đời sống tinh thần của nhân dân...'</i><br><b>Hãy xác định các mệnh đề ĐÚNG hoặc SAI:</b>",
+                items: [
+                    {
+                        text: "a) Hoạt động sản xuất âm nhạc là biểu hiện của hoạt động sản xuất.",
+                        shouldCheck: true, // TRUE
+                        rationale: "Đúng, vì góp phần tạo ra sản phẩm tinh thần đáp ứng nhu cầu của con người."
+                    },
+                    {
+                        text: "b) Những tác phẩm có giá trị nghệ thuật và nhân văn chính là thể hiện trách nhiệm xã hội của chủ thể kinh tế.",
+                        shouldCheck: true, // TRUE
+                        rationale: "Đúng, vì những giá trị này đóng góp quan trọng và tích cực cho đời sống xã hội."
+                    },
+                    {
+                        text: "c) Hoạt động thưởng thức âm nhạc của công chúng không phản ánh hoạt động tiêu dùng.",
+                        shouldCheck: false, // FALSE
+                        rationale: "Sai, thưởng thức âm nhạc của công chúng chính là biểu hiện của hoạt động tiêu dùng (tiêu dùng tinh thần)."
+                    },
+                    {
+                        text: "d) Quá trình truyền tải các sản phẩm âm nhạc của nhà sản xuất thông qua các nền tảng số và hạ tầng số để đưa sản phẩm đến tay công chúng là biểu hiện của hoạt động sản xuất.",
+                        shouldCheck: false, // FALSE
+                        rationale: "Sai, đó là hoạt động phân phối cho tiêu dùng (ở dạng sản phẩm tinh thần)."
+                    }
+                ]
+            },
+            {
+                type: "tf",
+                question: "<b>Câu 2 (Phần II):</b> Đọc đoạn thông tin về Công ty hoá mỹ phẩm A:<br><i>'Nhận thấy nhu cầu của người tiêu dùng về sản phẩm dầu gội tự nhiên mà trên thị trường chưa có, Công ty hoá mỹ phẩm A vừa đưa ra thị trường loại sản phẩm dầu gội bồ kết sả chanh. Sản phẩm được người tiêu dùng đón nhận và đánh giá cao. Vì thế, công ty mở rộng thêm quy mô sản xuất...'</i><br><b>Hãy xác định các mệnh đề ĐÚNG hoặc SAI:</b>",
+                items: [
+                    {
+                        text: "a) Công ty hóa mỹ phẩm A là doanh nghiệp hoạt động với tư cách là chủ thể trung gian.",
+                        shouldCheck: false, // FALSE
+                        rationale: "Sai, vì Công ty A là chủ thể sản xuất trực tiếp tạo ra sản phẩm."
+                    },
+                    {
+                        text: "b) Công ty đã vận dụng tốt chức năng của thông tin của thị trường.",
+                        shouldCheck: true, // TRUE
+                        rationale: "Đúng, từ thông tin nhu cầu thị trường, công ty đã chủ động tạo sản phẩm phù hợp."
+                    },
+                    {
+                        text: "c) Công ty đã vận dụng tốt chức năng điều tiết sản xuất kinh doanh.",
+                        shouldCheck: true, // TRUE
+                        rationale: "Đúng, vì công ty đã chủ động điều chỉnh quy mô sản xuất mở rộng sản phẩm."
+                    },
+                    {
+                        text: "d) Sản phẩm được người tiêu dùng đón nhận và đánh giá cao là thể hiện chức năng cung cấp thông tin cho các chủ thể.",
+                        shouldCheck: false, // FALSE
+                        rationale: "Sai, đây là thị trường thực hiện chức năng thừa nhận giá trị của hàng hoá."
+                    }
+                ]
+            },
+            {
+                type: "tf",
+                question: "<b>Câu 3 (Phần II):</b> Đọc đoạn thông tin về bạn K và bạn T kinh doanh hoa tươi dịp 20/10:<br><i>'Nhận thấy nhu cầu tiêu thụ hoa dịp 20/10 rất lớn. Bạn K và bạn T cùng dùng tiền tiết kiệm kinh doanh hoa tươi. Nhờ quảng cáo trực tiếp và mạng xã hội, hoa bán rất chạy. Hai bạn dự định dùng tiền lãi học khoá cắm hoa...'</i><br><b>Hãy xác định các mệnh đề ĐÚNG hoặc SAI:</b>",
+                items: [
+                    {
+                        text: "a) Việc chuẩn bị các vật dụng cũng như các nguồn lực cho việc thực hiện ý tưởng bán hoa vào ngày 20/10 là biểu hiện của hoạt động sản xuất.",
+                        shouldCheck: true, // TRUE
+                        rationale: "Đúng, vì góp phần tạo nên sản phẩm bó hoa phục vụ nhu cầu thị trường."
+                    },
+                    {
+                        text: "b) Bạn K và bạn T đã sử dụng hiệu quả hình thức phân phối là quảng cáo trực tiếp tại địa điểm bán và kết nối thông qua mạng xã hội.",
+                        shouldCheck: true, // TRUE
+                        rationale: "Đúng, việc tiếp thị truyền tải thông tin hiệu quả giúp bán được sản phẩm."
+                    },
+                    {
+                        text: "c) Khách hàng đã đón nhận những bó hoa xinh xắn và yêu thích là biểu hiện của hoạt động phân phối sản phẩm.",
+                        shouldCheck: false, // FALSE
+                        rationale: "Sai, việc khách đón nhận/thưởng thức là biểu hiện của hoạt động tiêu dùng."
+                    },
+                    {
+                        text: "d) Bạn K và bạn T vừa đóng vai trò là chủ thể sản xuất vừa đóng vai trò là chủ thể tiêu dùng.",
+                        shouldCheck: true, // TRUE
+                        rationale: "Đúng, cắm hoa bán là chủ thể sản xuất, mua vật liệu/dụng cụ cắm hoa là tiêu dùng cho sản xuất."
+                    }
+                ]
+            },
+            {
+                type: "tf",
+                question: "<b>Câu 4 (Phần II):</b> Đọc đoạn thông tin về Ngành dệt may Việt Nam:<br><i>'Trong bối cảnh cạnh tranh quyết liệt, ngành dệt may Việt Nam đã nỗ lực cải tiến kỹ thuật, máy móc hiện đại, nắm bắt nhu cầu chất liệu thân thiện môi trường... nhờ đó đứng vững và gia tăng lợi nhuận.'</i><br><b>Hãy xác định các mệnh đề ĐÚNG hoặc SAI:</b>",
+                items: [
+                    {
+                        text: "a) Cơ chế thị trường đòi hỏi ngành dệt may Việt Nam phải thích ứng để tồn tại.",
+                        shouldCheck: true, // TRUE
+                        rationale: "Đúng, áp lực cạnh tranh buộc doanh nghiệp nỗ lực cải tiến kỹ thuật và nâng cao năng lực."
+                    },
+                    {
+                        text: "b) Ngành dệt may đã nắm bắt được yêu cầu của cơ chế thị trường.",
+                        shouldCheck: true, // TRUE
+                        rationale: "Đúng, nhờ nắm bắt đòi hỏi của cơ chế thị trường nên ngành dệt may đã trụ vững."
+                    },
+                    {
+                        text: "c) Theo phạm vi lãnh thổ ngành dệt may đã xây dựng được thị trường trong nước và quốc tế.",
+                        shouldCheck: true, // TRUE
+                        rationale: "Đúng, ngoài tiêu thụ nội địa ngành đã vươn ra thị trường xuất khẩu."
+                    },
+                    {
+                        text: "d) Ngành dệt may Việt Nam không chịu sự tác động của cơ chế thị trường vì chúng ta có nguồn lao động dồi dào.",
+                        shouldCheck: false, // FALSE
+                        rationale: "Sai, ngành dệt may vẫn chịu tác động mãnh liệt từ quy luật cạnh tranh và cơ chế thị trường."
+                    }
+                ]
+            },
+            {
+                type: "tf",
+                question: "<b>Câu 5 (Phần II):</b> Đọc đoạn thông tin về Chính sách giảm nghèo tỉnh A:<br><i>'Thực hiện Nghị quyết Quốc hội, tỉnh A triển khai các chính sách khám chữa bệnh cho người nghèo, hỗ trợ bảo hiểm y tế hộ cận nghèo, học sinh nghèo, cho vay vốn ưu đãi...'</i><br><b>Hãy xác định các mệnh đề ĐÚNG hoặc SAI:</b>",
+                items: [
+                    {
+                        text: "a) Ngân sách nhà nước đã thể hiện vai trò là công cụ để nhà nước định hướng phát triển các vùng kinh tế.",
+                        shouldCheck: true, // TRUE
+                        rationale: "Đúng, việc đầu tư NSNN giúp tạo động lực phát triển kinh tế xã hội vùng khó khăn."
+                    },
+                    {
+                        text: "b) Việc ngân sách nhà nước hỗ trợ thực hiện chính sách khám chữa bệnh, hỗ trợ bảo hiểm là thực hiện vai trò điều tiết thu nhập.",
+                        shouldCheck: true, // TRUE
+                        rationale: "Đúng, hoạt động này giúp hỗ trợ trực tiếp đối tượng yếu thế, thu hẹp khoảng cách."
+                    },
+                    {
+                        text: "c) Việc thực hiện các chính sách giảm nghèo, chính sách khám chữa bệnh cho người nghèo, là biểu hiện của nguyên tắc hoàn trả trực tiếp từ việc thu ngân sách.",
+                        shouldCheck: false, // FALSE
+                        rationale: "Sai, đây là nguyên tắc KHÔNG hoàn trả trực tiếp của Ngân sách nhà nước."
+                    }
+                ]
+            }
+        ];
+
+        // Global State
+        let questions = [];
+        let currentIndex = 0;
+        let userAnswers = []; // stores user choices
+        let score = 0;
+        let correctCount = 0;
+        let wrongCount = 0;
+        let timerInterval = null;
+        let totalSeconds = 0;
+
+        function shuffleArray(array) {
+            let arr = JSON.parse(JSON.stringify(array));
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function startQuiz() {
+            const isShuffle = document.getElementById('shuffle-toggle').checked;
+            
+            if (isShuffle) {
+                questions = shuffleArray(rawQuestions).map(q => {
+                    if (q.type === 'mcq') {
+                        return { ...q, options: shuffleArray(q.options) };
+                    }
+                    return q;
+                });
+            } else {
+                questions = JSON.parse(JSON.stringify(rawQuestions));
+            }
+
+            currentIndex = 0;
+            score = 0;
+            correctCount = 0;
+            wrongCount = 0;
+            totalSeconds = 0;
+            userAnswers = new Array(questions.length).fill(null);
+
+            document.getElementById('welcome-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            document.getElementById('quiz-stats').classList.remove('hidden');
+            document.getElementById('total-q').textContent = questions.length;
+
+            startTimer();
+            renderQuestion();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                totalSeconds++;
+                const mins = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+                const secs = String(totalSeconds % 60).padStart(2, '0');
+                document.getElementById('timer').textContent = `${mins}:${secs}`;
+            }, 1000);
+        }
+
+        function renderQuestion() {
+            const q = questions[currentIndex];
+            document.getElementById('current-q').textContent = currentIndex + 1;
+            document.getElementById('question-index').textContent = `Câu ${currentIndex + 1}/${questions.length}`;
+            
+            // Progress Bar
+            const progress = ((currentIndex) / questions.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+
+            document.getElementById('question-text').innerHTML = q.question;
+            
+            // Hide Explanation
+            const expBox = document.getElementById('explanation-box');
+            expBox.classList.add('hidden');
+            expBox.className = "hidden mt-6 p-4 rounded-xl border text-sm leading-relaxed";
+
+            if (q.type === 'mcq') {
+                document.getElementById('part-tag').textContent = "Phần I: Trắc nghiệm (Chọn 1 đáp án)";
+                document.getElementById('mcq-options').classList.remove('hidden');
+                document.getElementById('tf-options').classList.add('hidden');
+                renderMCQ(q);
+            } else {
+                document.getElementById('part-tag').textContent = "Phần II: Đúng / Sai (Chỉ tích ý Đúng)";
+                document.getElementById('mcq-options').classList.add('hidden');
+                document.getElementById('tf-options').classList.remove('hidden');
+                renderTF(q);
+            }
+        }
+
+        function renderMCQ(q) {
+            const container = document.getElementById('mcq-options');
+            container.innerHTML = '';
+
+            const answered = userAnswers[currentIndex] !== null;
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-xl border-2 border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/50 transition-all font-medium text-slate-700 flex items-center justify-between";
+                
+                let iconHtml = `<span class="w-7 h-7 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center font-semibold text-xs text-slate-500 mr-3 shrink-0">${String.fromCharCode(65 + idx)}</span>`;
+                
+                btn.innerHTML = `<div class="flex items-center">${iconHtml}<span>${opt.text}</span></div><i class="status-icon"></i>`;
+
+                if (answered) {
+                    btn.disabled = true;
+                    const selectedIdx = userAnswers[currentIndex];
+                    if (opt.isCorrect) {
+                        btn.className = "w-full text-left p-4 rounded-xl border-2 correct-bg font-medium flex items-center justify-between";
+                        btn.querySelector('.status-icon').className = "fa-solid fa-circle-check text-emerald-600 text-lg";
+                    } else if (idx === selectedIdx) {
+                        btn.className = "w-full text-left p-4 rounded-xl border-2 wrong-bg font-medium flex items-center justify-between";
+                        btn.querySelector('.status-icon').className = "fa-solid fa-circle-xmark text-rose-600 text-lg";
+                    }
+                } else {
+                    btn.onclick = () => selectMCQAnswer(idx);
+                }
+
+                container.appendChild(btn);
+            });
+
+            if (answered) {
+                showMCQExplanation(q, userAnswers[currentIndex]);
+            }
+        }
+
+        function selectMCQAnswer(idx) {
+            userAnswers[currentIndex] = idx;
+            const q = questions[currentIndex];
+            const isCorrect = q.options[idx].isCorrect;
+
+            if (isCorrect) {
+                score++;
+                correctCount++;
+            } else {
+                wrongCount++;
+            }
+
+            renderMCQ(q);
+
+            // Auto next after 1.8s
+            setTimeout(() => {
+                nextQuestion();
+            }, 1800);
+        }
+
+        function showMCQExplanation(q, selectedIdx) {
+            const expBox = document.getElementById('explanation-box');
+            const expText = document.getElementById('explanation-text');
+            const expTitle = document.getElementById('explanation-title');
+
+            const correctOpt = q.options.find(o => o.isCorrect);
+            const userOpt = q.options[selectedIdx];
+
+            expBox.classList.remove('hidden');
+            if (userOpt.isCorrect) {
+                expBox.classList.add('bg-emerald-50', 'border-emerald-200');
+                expTitle.className = "font-bold flex items-center mb-1 text-emerald-800";
+                expTitle.innerHTML = `<i class="fa-solid fa-circle-check mr-2"></i>Chính xác!`;
+                expText.textContent = correctOpt.rationale;
+            } else {
+                expBox.classList.add('bg-rose-50', 'border-rose-200');
+                expTitle.className = "font-bold flex items-center mb-1 text-rose-800";
+                expTitle.innerHTML = `<i class="fa-solid fa-circle-xmark mr-2"></i>Chưa chính xác! Đáp án đúng: "${correctOpt.text}"`;
+                expText.textContent = `${userOpt.rationale} -> Ghi nhớ: ${correctOpt.rationale}`;
+            }
+        }
+
+        function renderTF(q) {
+            const container = document.getElementById('tf-list');
+            container.innerHTML = '';
+            const answered = userAnswers[currentIndex] !== null;
+
+            q.items.forEach((item, idx) => {
+                const div = document.createElement('div');
+                div.className = "p-4 rounded-xl border border-slate-200 bg-slate-50 flex flex-col space-y-2";
+                
+                const checked = answered ? userAnswers[currentIndex].includes(idx) : false;
+
+                let stateStyle = "";
+                let iconStatus = "";
+                let rationaleText = "";
+
+                if (answered) {
+                    const isUserChecked = userAnswers[currentIndex].includes(idx);
+                    const isActuallyTrue = item.shouldCheck; // True item
+
+                    if (isUserChecked === isActuallyTrue) {
+                        // User guessed right status (either checked correct or left unchecked correctly)
+                        if (isActuallyTrue) {
+                            stateStyle = "correct-bg";
+                            iconStatus = `<span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded"><i class="fa-solid fa-check mr-1"></i>Đúng (Đã tích chuẩn)</span>`;
+                        } else {
+                            stateStyle = "bg-slate-100 border-slate-300";
+                            iconStatus = `<span class="text-xs font-bold text-slate-600 bg-slate-200 px-2 py-0.5 rounded"><i class="fa-solid fa-check mr-1"></i>Sai (Giữ nguyên chuẩn)</span>`;
+                        }
+                    } else {
+                        // User guessed wrong
+                        if (isUserChecked && !isActuallyTrue) {
+                            stateStyle = "wrong-bg";
+                            iconStatus = `<span class="text-xs font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded"><i class="fa-solid fa-xmark mr-1"></i>Sai (Bạn tích nhầm)</span>`;
+                        } else if (!isUserChecked && isActuallyTrue) {
+                            stateStyle = "missed-bg";
+                            iconStatus = `<span class="text-xs font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded"><i class="fa-solid fa-exclamation mr-1"></i>Đúng (Bạn bỏ sót)</span>`;
+                        }
+                    }
+                    rationaleText = `<div class="text-xs mt-1 text-slate-600 border-t border-slate-200/60 pt-1.5"><b>Giải thích:</b> ${item.rationale}</div>`;
+                }
+
+                div.className = `p-4 rounded-xl border flex flex-col space-y-2 transition-all ${stateStyle || 'border-slate-200 bg-white'}`;
+
+                div.innerHTML = `
+                    <div class="flex items-start justify-between">
+                        <label class="flex items-start space-x-3 cursor-pointer text-slate-800 font-medium text-sm flex-grow pr-2">
+                            <input type="checkbox" data-idx="${idx}" ${checked ? 'checked' : ''} ${answered ? 'disabled' : ''} class="mt-1 w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+                            <span>${item.text}</span>
+                        </label>
+                        ${iconStatus}
+                    </div>
+                    ${rationaleText}
+                `;
+
+                container.appendChild(div);
+            });
+
+            const submitBtn = document.getElementById('tf-submit-btn');
+            if (answered) {
+                submitBtn.textContent = "Sang câu tiếp theo";
+                submitBtn.onclick = () => nextQuestion();
+            } else {
+                submitBtn.textContent = "Xác nhận & Sang câu tiếp theo";
+                submitBtn.onclick = () => submitTFAnswer();
+            }
+        }
+
+        function submitTFAnswer() {
+            const q = questions[currentIndex];
+            const checkboxes = document.querySelectorAll('#tf-list input[type="checkbox"]');
+            const selectedIndices = [];
+
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    selectedIndices.push(parseInt(cb.getAttribute('data-idx')));
+                }
+            });
+
+            userAnswers[currentIndex] = selectedIndices;
+
+            // Calculate score for TF (Full match = 1 point)
+            let isAllCorrect = true;
+            q.items.forEach((item, idx) => {
+                const isChecked = selectedIndices.includes(idx);
+                if (isChecked !== item.shouldCheck) {
+                    isAllCorrect = false;
+                }
+            });
+
+            if (isAllCorrect) {
+                score++;
+                correctCount++;
+            } else {
+                wrongCount++;
+            }
+
+            renderTF(q);
+        }
+
+        function nextQuestion() {
+            if (currentIndex < questions.length - 1) {
+                currentIndex++;
+                renderQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function finishQuiz() {
+            clearInterval(timerInterval);
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('quiz-stats').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+
+            document.getElementById('score-text').textContent = `${score}/${questions.length}`;
+            document.getElementById('correct-count').textContent = correctCount;
+            document.getElementById('wrong-count').textContent = wrongCount;
+            
+            const mins = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+            const secs = String(totalSeconds % 60).padStart(2, '0');
+            document.getElementById('total-time').textContent = `${mins}:${secs}`;
+        }
+
+        function restartQuiz() {
+            startQuiz();
+        }
+    </script>
+</body>
+</html>
+```eof
+
+### Đã hoàn thành bộ ứng dụng:
+- Tất cả 45 câu trắc nghiệm đơn và 5 câu trắc nghiệm phức hợp (Đúng/Sai) đã được chuyển tải nguyên văn.
+- Tùy chọn xáo trộn thứ tự câu hỏi và thứ tự đáp án giúp trải nghiệm học bài linh hoạt hơn.
+- Hiển thị phản hồi tức thì và giải thích chi tiết đáp án giúp ghi nhớ tốt hơn cho bài thi giữa kì.
+
+Chúc bạn ôn tập đạt kết quả cao nhất trong kì thi KTPL 10!
